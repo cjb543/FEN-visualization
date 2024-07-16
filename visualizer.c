@@ -4,13 +4,14 @@
 
 void processBoardAppearance(char FENString[], char finishedBoard[]);
 void processGameState(char FENString[], int *whitePieceCount,
-                      int *blackCountPiece, bool *whiteToMove);
+                      int *blackCountPiece, bool *whiteToMove,
+                      bool *whiteCanCastle, bool *blackCanCastle);
 void printBoard(char FENString[], int whitePieceCount, int blackPieceCount,
-                bool whiteToMove);
+                bool whiteToMove, bool whiteCanCastle, bool blackCanCastle);
 
 int main() {
   int whitePieceCount = 0, blackPieceCount = 0;
-  bool whiteToMove;
+  bool whiteToMove, whiteCanCastle, blackCanCastle;
   char FENString[91];
   char finishedBoard[65];
 
@@ -18,8 +19,10 @@ int main() {
   scanf("%s", FENString);
 
   processBoardAppearance(FENString, finishedBoard);
-  processGameState(FENString, &whitePieceCount, &blackPieceCount, &whiteToMove);
-  printBoard(finishedBoard, whitePieceCount, blackPieceCount, whiteToMove);
+  processGameState(FENString, &whitePieceCount, &blackPieceCount, &whiteToMove,
+                   &whiteCanCastle, &blackCanCastle);
+  printBoard(finishedBoard, whitePieceCount, blackPieceCount, whiteToMove,
+             whiteCanCastle, blackCanCastle);
 
   return 0;
 }
@@ -46,7 +49,8 @@ void processBoardAppearance(char FENString[], char finishedBoard[]) {
 }
 
 void processGameState(char FENString[], int *whitePieceCount,
-                      int *blackPieceCount, bool *whiteToMove) {
+                      int *blackPieceCount, bool *whiteToMove,
+                      bool *whiteCanCastle, bool *blackCanCastle) {
   for (int i = 0; i < 91; i++) {
     if (isupper(FENString[i]) && isalpha(FENString[i])) {
       whitePieceCount++;
@@ -57,15 +61,34 @@ void processGameState(char FENString[], int *whitePieceCount,
 }
 
 void printBoard(char finishedBoard[], int whitePieceCount, int blackPieceCount,
-                bool whiteToMove) {
-  printf("%s", finishedBoard);
+                bool whiteToMove, bool whiteCanCastle, bool blackCanCastle) {
+  // print actual board
+  printf(" ");
+  int i = 0;
+  while (finishedBoard[i] != '\0') {
+    printf("%c ", finishedBoard[i]);
+    i++;
+  }
   printf("\n");
 
-  printf("White has %d pieces \n", whitePieceCount);
-  printf("Black has %d pieces \n", blackPieceCount);
+  // Handle piece counts
+  printf("White has %d pieces. \n", whitePieceCount);
+  printf("Black has %d pieces. \n", blackPieceCount);
 
+  // Handle move turn
   if (whiteToMove)
-    printf("White to move \n");
+    printf("White to move. \n");
   else
-    printf("blackToMove \n");
+    printf("Black to move. \n");
+
+  // Handle castling
+  if (whiteCanCastle)
+    printf("White has castling rights.\n");
+  else if (!whiteCanCastle)
+    printf("White does not have castling rights.\n");
+  if (blackCanCastle)
+    printf("Black has castling rights.\n");
+  else if (!blackCanCastle) {
+    printf("Black does not have castling rights.\n");
+  }
 }
