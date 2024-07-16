@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 void processBoardAppearance(char FENString[], char finishedBoard[]);
 void processGameState(char FENString[], int *whitePieceCount,
@@ -12,9 +13,9 @@ void printBoard(char finishedBoard[], int whitePieceCount, int blackPieceCount,
                 int whiteFiftyMoveTracker, int blackFiftyMoveTracker);
 
 int main() {
-  int whitePieceCount = 0, blackPieceCount = 0, whiteFiftyMoveTracker,
-      blackFiftyMoveTracker;
-  bool whiteToMove, whiteCanCastle, blackCanCastle;
+  int whitePieceCount = 0, blackPieceCount = 0, whiteFiftyMoveTracker = 0,
+      blackFiftyMoveTracker = 0;
+  bool whiteToMove = false, whiteCanCastle = false, blackCanCastle = false;
   char FENString[91];
   char finishedBoard[65];
 
@@ -58,10 +59,16 @@ void processGameState(char FENString[], int *whitePieceCount,
                       int *blackFiftyMoveTracker, bool *whiteToMove,
                       bool *whiteCanCastle, bool *blackCanCastle) {
   for (int i = 0; i < 91; i++) {
+    if (FENString[i] == ' ') {
+      break;
+    }
     if (isupper(FENString[i]) && isalpha(FENString[i])) {
-      whitePieceCount++;
+      (*whitePieceCount)++;
     } else if (!isupper(FENString[i]) && isalpha(FENString[i])) {
-      blackPieceCount++;
+      (*blackPieceCount)++;
+    }
+    if (isspace(FENString[i])) {
+      char *token = strtok(FENString, " ");
     }
   }
 }
@@ -100,6 +107,6 @@ void printBoard(char finishedBoard[], int whitePieceCount, int blackPieceCount,
   }
 
   // Handle 50-move-rule tracking
-  printf("White has %d moves until 50-move rule.", whiteFiftyMoveTracker);
-  printf("Black has %d moves until 50-move rule.", blackFiftyMoveTracker);
+  printf("White has %d moves until 50-move rule.\n", whiteFiftyMoveTracker);
+  printf("Black has %d moves until 50-move rule.\n", blackFiftyMoveTracker);
 }
