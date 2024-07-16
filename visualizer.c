@@ -4,13 +4,16 @@
 
 void processBoardAppearance(char FENString[], char finishedBoard[]);
 void processGameState(char FENString[], int *whitePieceCount,
-                      int *blackCountPiece, bool *whiteToMove,
+                      int *blackCountPiece, int *whiteFiftyMoveTracker,
+                      int *blackFiftyMoveTracker, bool *whiteToMove,
                       bool *whiteCanCastle, bool *blackCanCastle);
-void printBoard(char FENString[], int whitePieceCount, int blackPieceCount,
-                bool whiteToMove, bool whiteCanCastle, bool blackCanCastle);
+void printBoard(char finishedBoard[], int whitePieceCount, int blackPieceCount,
+                bool whiteToMove, bool whiteCanCastle, bool blackCanCastle,
+                int whiteFiftyMoveTracker, int blackFiftyMoveTracker);
 
 int main() {
-  int whitePieceCount = 0, blackPieceCount = 0;
+  int whitePieceCount = 0, blackPieceCount = 0, whiteFiftyMoveTracker,
+      blackFiftyMoveTracker;
   bool whiteToMove, whiteCanCastle, blackCanCastle;
   char FENString[91];
   char finishedBoard[65];
@@ -19,10 +22,12 @@ int main() {
   scanf("%s", FENString);
 
   processBoardAppearance(FENString, finishedBoard);
-  processGameState(FENString, &whitePieceCount, &blackPieceCount, &whiteToMove,
+  processGameState(FENString, &whitePieceCount, &blackPieceCount,
+                   &whiteFiftyMoveTracker, &blackFiftyMoveTracker, &whiteToMove,
                    &whiteCanCastle, &blackCanCastle);
   printBoard(finishedBoard, whitePieceCount, blackPieceCount, whiteToMove,
-             whiteCanCastle, blackCanCastle);
+             whiteCanCastle, blackCanCastle, whiteFiftyMoveTracker,
+             blackFiftyMoveTracker);
 
   return 0;
 }
@@ -49,7 +54,8 @@ void processBoardAppearance(char FENString[], char finishedBoard[]) {
 }
 
 void processGameState(char FENString[], int *whitePieceCount,
-                      int *blackPieceCount, bool *whiteToMove,
+                      int *blackPieceCount, int *whiteFiftyMoveTracker,
+                      int *blackFiftyMoveTracker, bool *whiteToMove,
                       bool *whiteCanCastle, bool *blackCanCastle) {
   for (int i = 0; i < 91; i++) {
     if (isupper(FENString[i]) && isalpha(FENString[i])) {
@@ -61,8 +67,9 @@ void processGameState(char FENString[], int *whitePieceCount,
 }
 
 void printBoard(char finishedBoard[], int whitePieceCount, int blackPieceCount,
-                bool whiteToMove, bool whiteCanCastle, bool blackCanCastle) {
-  // print actual board
+                bool whiteToMove, bool whiteCanCastle, bool blackCanCastle,
+                int whiteFiftyMoveTracker, int blackFiftyMoveTracker) {
+  // Print actual board
   printf(" ");
   int i = 0;
   while (finishedBoard[i] != '\0') {
@@ -91,4 +98,8 @@ void printBoard(char finishedBoard[], int whitePieceCount, int blackPieceCount,
   else if (!blackCanCastle) {
     printf("Black does not have castling rights.\n");
   }
+
+  // Handle 50-move-rule tracking
+  printf("White has %d moves until 50-move rule.", whiteFiftyMoveTracker);
+  printf("Black has %d moves until 50-move rule.", blackFiftyMoveTracker);
 }
