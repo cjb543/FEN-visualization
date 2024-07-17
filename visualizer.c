@@ -12,33 +12,28 @@ int main(int argc, char *argv[]) {
   char FENString[92], whiteFiftyMoveTracker[2], blackFiftyMoveTracker[2];
   char finishedBoard[100];
 
+  // Error-checking user input
   if (argc != 2) {
     printf("Usage: %s <``FEN string``>\n Enclose your FEN string in quotes.\n",
            argv[0]);
     return 1;
   }
 
+  // Copy user string into FENString
   strncpy(FENString, argv[1], 90);
 
+  // Error-check that FENString isn't longer than theoretical limit
   if (strlen(FENString) > 91) {
     printf("Invalid FEN string. Quitting...\n");
     exit(-1);
   }
 
-  printf("%s", "\n Summary of FEN-String:\n ");
-
-  for (size_t i = 0; i < strlen(FENString); i++) {
-    printf("%c", FENString[i]);
-  }
-
-  printf("%s", "\n\n");
-
   processBoardAppearance(FENString, finishedBoard);
   processGameState(FENString, &whitePieceCount, &blackPieceCount,
                    whiteFiftyMoveTracker, blackFiftyMoveTracker, &whiteToMove,
                    &whiteCanCastle, &blackCanCastle, &hasEnPassant);
-  printBoard(finishedBoard, whitePieceCount, blackPieceCount, whiteToMove,
-             whiteCanCastle, blackCanCastle, whiteFiftyMoveTracker,
+  printBoard(FENString, finishedBoard, whitePieceCount, blackPieceCount,
+             whiteToMove, whiteCanCastle, blackCanCastle, whiteFiftyMoveTracker,
              blackFiftyMoveTracker, hasEnPassant);
 
   return 0;
@@ -130,10 +125,17 @@ void processGameState(char FENString[], int *whitePieceCount,
   return;
 }
 
-void printBoard(char finishedBoard[], int whitePieceCount, int blackPieceCount,
-                bool whiteToMove, bool whiteCanCastle, bool blackCanCastle,
-                char whiteFiftyMoveTracker[], char blackFiftyMoveTracker[],
-                bool hasEnPassant) {
+void printBoard(char FENString[], char finishedBoard[], int whitePieceCount,
+                int blackPieceCount, bool whiteToMove, bool whiteCanCastle,
+                bool blackCanCastle, char whiteFiftyMoveTracker[],
+                char blackFiftyMoveTracker[], bool hasEnPassant) {
+
+  printf("%s", "\n Summary of FEN-String:\n ");
+  for (size_t i = 0; i < strlen(FENString); i++) {
+    printf("%c", FENString[i]);
+  }
+
+  printf("%s", "\n\n");
   for (int i = 0; i < 71; i++) {
     printf(" %c", finishedBoard[i]);
   }
