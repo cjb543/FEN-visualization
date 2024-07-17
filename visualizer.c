@@ -1,34 +1,47 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 void processBoardAppearance(char FENString[], char finishedBoard[]);
 void processGameState(char FENString[], int *whitePieceCount,
                       int *blackCountPiece, int *whiteFiftyMoveTracker,
                       int *blackFiftyMoveTracker, bool *whiteToMove,
-                      bool *whiteCanCastle, bool *blackCanCastle);
+                      bool *whiteCanCastle, bool *blackCanCastle,
+                      bool *hasEnPassant);
 void printBoard(char finishedBoard[], int whitePieceCount, int blackPieceCount,
                 bool whiteToMove, bool whiteCanCastle, bool blackCanCastle,
-                int whiteFiftyMoveTracker, int blackFiftyMoveTracker);
+                int whiteFiftyMoveTracker, int blackFiftyMoveTracker,
+                bool hasEnPassant);
 
-int main() {
+int main(int argc, char *argv[]) {
   int whitePieceCount = 0, blackPieceCount = 0, whiteFiftyMoveTracker = 0,
       blackFiftyMoveTracker = 0;
-  bool whiteToMove = false, whiteCanCastle = false, blackCanCastle = false;
-  char FENString[91];
+  bool whiteToMove = false, whiteCanCastle = false, blackCanCastle = false,
+       hasEnPassant = false;
+  char FENString[91] = "";
   char finishedBoard[65];
 
-  printf("Enter a FEN string: ");
-  scanf("%s", FENString);
+  if (argc < 2 || argc > 7) {
+    printf("Usage: %s <FEN string>\n", argv[0]);
+    return 1;
+  }
+
+  for (int i = 1; i < argc; i++) {
+    strncat(FENString, argv[i], 90 - strlen(FENString));
+    if (i < argc - 1) {
+      strncat(FENString, " ", 90 - strlen(FENString));
+    }
+  }
 
   processBoardAppearance(FENString, finishedBoard);
   processGameState(FENString, &whitePieceCount, &blackPieceCount,
                    &whiteFiftyMoveTracker, &blackFiftyMoveTracker, &whiteToMove,
-                   &whiteCanCastle, &blackCanCastle);
+                   &whiteCanCastle, &blackCanCastle, &hasEnPassant);
   printBoard(finishedBoard, whitePieceCount, blackPieceCount, whiteToMove,
              whiteCanCastle, blackCanCastle, whiteFiftyMoveTracker,
-             blackFiftyMoveTracker);
+             blackFiftyMoveTracker, hasEnPassant);
 
   return 0;
 }
@@ -39,7 +52,7 @@ void processBoardAppearance(char FENString[], char finishedBoard[]) {
     if (isdigit(FENString[i])) {
       int numSpaces = FENString[i] - '0';
       for (int k = 0; k < numSpaces; k++) {
-        finishedBoard[j] = 'X';
+        finishedBoard[j] = '0';
         ++j;
       }
     } else if (isalpha(FENString[i])) {
@@ -57,25 +70,18 @@ void processBoardAppearance(char FENString[], char finishedBoard[]) {
 void processGameState(char FENString[], int *whitePieceCount,
                       int *blackPieceCount, int *whiteFiftyMoveTracker,
                       int *blackFiftyMoveTracker, bool *whiteToMove,
-                      bool *whiteCanCastle, bool *blackCanCastle) {
+                      bool *whiteCanCastle, bool *blackCanCastle,
+                      bool *hasEnPassant) {
   for (int i = 0; i < 91; i++) {
-    if (FENString[i] == ' ') {
-      break;
-    }
-    if (isupper(FENString[i]) && isalpha(FENString[i])) {
-      (*whitePieceCount)++;
-    } else if (!isupper(FENString[i]) && isalpha(FENString[i])) {
-      (*blackPieceCount)++;
-    }
-    if (isspace(FENString[i])) {
-      char *token = strtok(FENString, " ");
-    }
+    printf("%c", FENString[i]);
   }
+  printf("%s", "\n");
 }
 
 void printBoard(char finishedBoard[], int whitePieceCount, int blackPieceCount,
                 bool whiteToMove, bool whiteCanCastle, bool blackCanCastle,
-                int whiteFiftyMoveTracker, int blackFiftyMoveTracker) {
+                int whiteFiftyMoveTracker, int blackFiftyMoveTracker,
+                bool hasEnPassant) {
   // Print actual board
   printf(" ");
   int i = 0;
