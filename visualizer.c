@@ -32,9 +32,9 @@ int main(int argc, char *argv[]) {
   processGameState(FENString, &whitePieceCount, &blackPieceCount,
                    whiteFiftyMoveTracker, blackFiftyMoveTracker, &whiteToMove,
                    &whiteCanCastle, &blackCanCastle, &hasEnPassant);
-  printBoard(FENString, finishedBoard, whitePieceCount, blackPieceCount,
-             whiteToMove, whiteCanCastle, blackCanCastle, whiteFiftyMoveTracker,
-             blackFiftyMoveTracker, hasEnPassant);
+  printGame(FENString, finishedBoard, whitePieceCount, blackPieceCount,
+            whiteToMove, whiteCanCastle, blackCanCastle, whiteFiftyMoveTracker,
+            blackFiftyMoveTracker, hasEnPassant);
 
   return 0;
 }
@@ -125,10 +125,10 @@ void processGameState(char FENString[], int *whitePieceCount,
   return;
 }
 
-void printBoard(char FENString[], char finishedBoard[], int whitePieceCount,
-                int blackPieceCount, bool whiteToMove, bool whiteCanCastle,
-                bool blackCanCastle, char whiteFiftyMoveTracker[],
-                char blackFiftyMoveTracker[], bool hasEnPassant) {
+void printGame(char FENString[], char finishedBoard[], int whitePieceCount,
+               int blackPieceCount, bool whiteToMove, bool whiteCanCastle,
+               bool blackCanCastle, char whiteFiftyMoveTracker[],
+               char blackFiftyMoveTracker[], bool hasEnPassant) {
 
   printf("%s", "\n Summary of FEN-String:\n ");
   for (size_t i = 0; i < strlen(FENString); i++) {
