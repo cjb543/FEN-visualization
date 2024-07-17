@@ -22,12 +22,6 @@ int main(int argc, char *argv[]) {
   // Copy user string into FENString
   strncpy(FENString, argv[1], 90);
 
-  // Error-check that FENString isn't longer than theoretical limit
-  if (strlen(FENString) > 91) {
-    printf("Invalid FEN string. Quitting...\n");
-    exit(-1);
-  }
-
   processBoardAppearance(FENString, finishedBoard);
   processGameState(FENString, &whitePieceCount, &blackPieceCount,
                    whiteFiftyMoveTracker, blackFiftyMoveTracker, &whiteToMove,
