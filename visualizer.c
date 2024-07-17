@@ -85,7 +85,8 @@ void printBoard(char finishedBoard[], int whitePieceCount, int blackPieceCount,
   // Print actual board
   printf(" ");
   int i = 0;
-  while (finishedBoard[i] != '\0') {
+  // WHY IS IT +4 IM DEADDDDD
+  while (finishedBoard[i + 4] != '\0') {
     printf("%c ", finishedBoard[i]);
     i++;
   }
