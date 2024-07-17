@@ -6,38 +6,47 @@
 
 void processBoardAppearance(char FENString[], char finishedBoard[]);
 void processGameState(char FENString[], int *whitePieceCount,
-                      int *blackCountPiece, int *whiteFiftyMoveTracker,
-                      int *blackFiftyMoveTracker, bool *whiteToMove,
+                      int *blackPieceCount, char whiteFiftyMoveTracker[],
+                      char blackFiftyMoveTracker[], bool *whiteToMove,
                       bool *whiteCanCastle, bool *blackCanCastle,
                       bool *hasEnPassant);
 void printBoard(char finishedBoard[], int whitePieceCount, int blackPieceCount,
                 bool whiteToMove, bool whiteCanCastle, bool blackCanCastle,
-                int whiteFiftyMoveTracker, int blackFiftyMoveTracker,
+                char whiteFiftyMoveTracker[], char blackFiftyMoveTracker[],
                 bool hasEnPassant);
 
 int main(int argc, char *argv[]) {
-  int whitePieceCount = 0, blackPieceCount = 0, whiteFiftyMoveTracker = 0,
-      blackFiftyMoveTracker = 0;
+  int whitePieceCount = 0, blackPieceCount = 0;
   bool whiteToMove = false, whiteCanCastle = false, blackCanCastle = false,
        hasEnPassant = false;
-  char FENString[91] = "";
+  char FENString[91] = "", whiteFiftyMoveTracker[2] = "",
+       blackFiftyMoveTracker[2] = "";
   char finishedBoard[65];
 
-  if (argc < 2 || argc > 7) {
-    printf("Usage: %s <FEN string>\n", argv[0]);
+  if (argc != 2) {
+    printf("Usage: %s <``FEN string``>\n Enclose your FEN string in quotes.\n",
+           argv[0]);
     return 1;
   }
 
-  for (int i = 1; i < argc; i++) {
-    strncat(FENString, argv[i], 90 - strlen(FENString));
-    if (i < argc - 1) {
-      strncat(FENString, " ", 90 - strlen(FENString));
-    }
+  strncpy(FENString, argv[1], 90);
+
+  if (strlen(FENString) > 91) {
+    printf("Invalid FEN string. Quitting...\n");
+    exit(-1);
   }
+
+  printf("%s", "\n Summary of FEN-String:\n ");
+
+  for (size_t i = 0; i < strlen(FENString); i++) {
+    printf("%c", FENString[i]);
+  }
+
+  printf("%s", "\n\n");
 
   processBoardAppearance(FENString, finishedBoard);
   processGameState(FENString, &whitePieceCount, &blackPieceCount,
-                   &whiteFiftyMoveTracker, &blackFiftyMoveTracker, &whiteToMove,
+                   whiteFiftyMoveTracker, blackFiftyMoveTracker, &whiteToMove,
                    &whiteCanCastle, &blackCanCastle, &hasEnPassant);
   printBoard(finishedBoard, whitePieceCount, blackPieceCount, whiteToMove,
              whiteCanCastle, blackCanCastle, whiteFiftyMoveTracker,
@@ -68,52 +77,104 @@ void processBoardAppearance(char FENString[], char finishedBoard[]) {
 }
 
 void processGameState(char FENString[], int *whitePieceCount,
-                      int *blackPieceCount, int *whiteFiftyMoveTracker,
-                      int *blackFiftyMoveTracker, bool *whiteToMove,
+                      int *blackPieceCount, char whiteFiftyMoveTracker[],
+                      char blackFiftyMoveTracker[], bool *whiteToMove,
                       bool *whiteCanCastle, bool *blackCanCastle,
                       bool *hasEnPassant) {
-  for (int i = 0; i < 91; i++) {
-    printf("%c", FENString[i]);
+  // Check amount of black and white pieces
+  for (size_t i = 0; i < strlen(FENString); i++) {
+    if (isspace(FENString[i])) {
+      break;
+    }
+    if (isupper(FENString[i]))
+      (*whitePieceCount)++;
+    if (isupper(FENString[i]) == false && isalpha(FENString[i])) {
+      (*blackPieceCount)++;
+    }
   }
-  printf("%s", "\n");
+
+  bool castlingAssigned = false, halfMoveAssigned = false;
+  int FENStringLength = strlen(FENString);
+  char FENStringCopy[FENStringLength];
+  strcpy(FENStringCopy, FENString);
+  char *token = strtok(FENStringCopy, " ");
+  token = strtok(NULL, " ");
+
+  for (size_t i = 0; i < strlen(FENStringCopy); i++) {
+    printf(" %c", FENStringCopy[i]);
+  }
+  printf("\nYOUR TOKEN: %s \n", token);
+  while (token != NULL) {
+    // Determine who goes next
+    if (strcmp(token, "w") == 0) {
+      *whiteToMove = true;
+    } else if (strcmp(token, "b") == 0) {
+      *whiteToMove = false;
+    }
+
+    int tokenLength = strlen(token);
+    // Determine castling rights
+    if (isupper(token[0])) {
+      *whiteCanCastle = true;
+      castlingAssigned = true;
+    } else if (!isupper(token[tokenLength - 1]) && castlingAssigned == false) {
+      *blackCanCastle = true;
+      castlingAssigned = true;
+    }
+
+    // Determine if en passant square exists
+    if (strcmp(token, "-") && castlingAssigned == true) {
+      *hasEnPassant = false;
+    } else if (!strcmp(token, "-") && castlingAssigned == true) {
+      *hasEnPassant = true;
+    }
+
+    // Half Move Counter
+    if (isdigit(token[0]) && halfMoveAssigned == false) {
+      strcat(whiteFiftyMoveTracker, token);
+      halfMoveAssigned = true;
+    } else if (isdigit(token[0]) && halfMoveAssigned == true) {
+      strcat(blackFiftyMoveTracker, token);
+    }
+    token = strtok(NULL, " ");
+  }
+
+  return;
 }
 
 void printBoard(char finishedBoard[], int whitePieceCount, int blackPieceCount,
                 bool whiteToMove, bool whiteCanCastle, bool blackCanCastle,
-                int whiteFiftyMoveTracker, int blackFiftyMoveTracker,
+                char whiteFiftyMoveTracker[], char blackFiftyMoveTracker[],
                 bool hasEnPassant) {
-  // Print actual board
-  printf(" ");
-  int i = 0;
-  // WHY IS IT +4 IM DEADDDDD
-  while (finishedBoard[i + 4] != '\0') {
-    printf("%c ", finishedBoard[i]);
-    i++;
+  for (int i = 0; i < 71; i++) {
+    printf(" %c", finishedBoard[i]);
   }
-  printf("\n");
+  printf("\n\n");
 
   // Handle piece counts
-  printf("White has %d pieces. \n", whitePieceCount);
-  printf("Black has %d pieces. \n", blackPieceCount);
+  printf(" White has %d pieces. \n", whitePieceCount);
+  printf(" Black has %d pieces. \n", blackPieceCount);
 
   // Handle move turn
   if (whiteToMove)
-    printf("White to move. \n");
+    printf(" White to move. \n");
   else
-    printf("Black to move. \n");
+    printf(" Black to move. \n");
 
   // Handle castling
   if (whiteCanCastle)
-    printf("White has castling rights.\n");
+    printf(" White has castling rights.\n");
   else if (!whiteCanCastle)
-    printf("White does not have castling rights.\n");
+    printf(" White does not have castling rights.\n");
   if (blackCanCastle)
-    printf("Black has castling rights.\n");
+    printf(" Black has castling rights.\n");
   else if (!blackCanCastle) {
-    printf("Black does not have castling rights.\n");
+    printf(" Black does not have castling rights.\n");
   }
 
+  if (hasEnPassant)
+    printf(" En Passant is possible\n");
   // Handle 50-move-rule tracking
-  printf("White has %d moves until 50-move rule.\n", whiteFiftyMoveTracker);
-  printf("Black has %d moves until 50-move rule.\n", blackFiftyMoveTracker);
+  printf(" %s Half-Moves\n", whiteFiftyMoveTracker);
+  printf(" %s Full-Moves\n", blackFiftyMoveTracker);
 }
