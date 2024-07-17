@@ -15,10 +15,9 @@ char FENString[92], whiteFiftyMoveTracker[2], blackFiftyMoveTracker[2],
     finishedBoard[100];
 
 int main(int argc, char *argv[]) {
-
   // Error-checking user input
   if (argc != 2) {
-    printf("Usage: %s <``FEN string``>\n Enclose your FEN string in quotes.\n",
+    printf(" Usage: %s <\"FEN string\">\n Enclose your FEN string in quotes.\n",
            argv[0]);
     return 1;
   }
@@ -136,12 +135,13 @@ void printGame(char FENString[], char finishedBoard[], int whitePieceCount,
                int blackPieceCount, bool whiteToMove, bool whiteCanCastle,
                bool blackCanCastle, char whiteFiftyMoveTracker[],
                char blackFiftyMoveTracker[], bool hasEnPassant) {
-
+  // Print board summary
   printf("%s", "\n Summary of FEN-String:\n ");
   for (size_t i = 0; i < strlen(FENString); i++) {
     printf("%c", FENString[i]);
   }
 
+  // Print pieces
   printf("%s", "\n\n");
   for (int i = 0; i < 71; i++) {
     printf(" %c", finishedBoard[i]);
