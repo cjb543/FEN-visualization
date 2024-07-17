@@ -89,7 +89,6 @@ void processGameState(char FENString[], int *whitePieceCount,
   // it
   int FENStringLength = strlen(FENString);
   char FENStringCopy[FENStringLength];
-
   strcpy(FENStringCopy, FENString);
 
   // Tokenize FENString and start at second token
@@ -104,6 +103,7 @@ void processGameState(char FENString[], int *whitePieceCount,
       *whiteToMove = false;
 
     int tokenLength = strlen(token);
+
     // Determine castling rights
     if (isupper(token[0])) {
       *whiteCanCastle = true;
@@ -148,17 +148,17 @@ void printGame(char FENString[], char finishedBoard[], int whitePieceCount,
   }
   printf("\n\n");
 
-  // Handle piece counts
+  // Print piece counts
   printf(" White has %d pieces. \n", whitePieceCount);
   printf(" Black has %d pieces. \n", blackPieceCount);
 
-  // Handle move turn
+  // Print move turn
   if (whiteToMove)
     printf(" White to move. \n");
   else
     printf(" Black to move. \n");
 
-  // Handle castling
+  // Print castling
   if (whiteCanCastle)
     printf(" White has castling rights.\n");
   else if (!whiteCanCastle)
@@ -168,6 +168,7 @@ void printGame(char FENString[], char finishedBoard[], int whitePieceCount,
   else if (!blackCanCastle)
     printf(" Black does not have castling rights.\n");
 
+  // Print if En Passant square exists
   if (hasEnPassant == true)
     printf(" En Passant squares possible.\n");
 
