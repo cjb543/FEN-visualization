@@ -19,9 +19,8 @@ int main(int argc, char *argv[]) {
   int whitePieceCount = 0, blackPieceCount = 0;
   bool whiteToMove = false, whiteCanCastle = false, blackCanCastle = false,
        hasEnPassant = false;
-  char FENString[91] = "", whiteFiftyMoveTracker[2] = "",
-       blackFiftyMoveTracker[2] = "";
-  char finishedBoard[65];
+  char FENString[92], whiteFiftyMoveTracker[2], blackFiftyMoveTracker[2];
+  char finishedBoard[100];
 
   if (argc != 2) {
     printf("Usage: %s <``FEN string``>\n Enclose your FEN string in quotes.\n",
@@ -56,18 +55,22 @@ int main(int argc, char *argv[]) {
 }
 
 void processBoardAppearance(char FENString[], char finishedBoard[]) {
+  int FENStringLen = strlen(FENString);
+  char FENStringCopy[FENStringLen];
+  strcpy(FENStringCopy, FENString);
+
   int i = 0, j = 0;
-  while (FENString[i] != '\0') {
-    if (isdigit(FENString[i])) {
-      int numSpaces = FENString[i] - '0';
+  while (FENStringCopy[i] != '\0') {
+    if (isdigit(FENStringCopy[i])) {
+      int numSpaces = FENStringCopy[i] - '0';
       for (int k = 0; k < numSpaces; k++) {
         finishedBoard[j] = '0';
         ++j;
       }
-    } else if (isalpha(FENString[i])) {
-      finishedBoard[j] = FENString[i];
+    } else if (isalpha(FENStringCopy[i])) {
+      finishedBoard[j] = FENStringCopy[i];
       ++j;
-    } else if (FENString[i] == '/') {
+    } else if (FENStringCopy[i] == '/') {
       finishedBoard[j] = '\n';
       ++j;
     }
@@ -99,11 +102,6 @@ void processGameState(char FENString[], int *whitePieceCount,
   strcpy(FENStringCopy, FENString);
   char *token = strtok(FENStringCopy, " ");
   token = strtok(NULL, " ");
-
-  for (size_t i = 0; i < strlen(FENStringCopy); i++) {
-    printf(" %c", FENStringCopy[i]);
-  }
-  printf("\nYOUR TOKEN: %s \n", token);
   while (token != NULL) {
     // Determine who goes next
     if (strcmp(token, "w") == 0) {
@@ -172,8 +170,9 @@ void printBoard(char finishedBoard[], int whitePieceCount, int blackPieceCount,
     printf(" Black does not have castling rights.\n");
   }
 
-  if (hasEnPassant)
-    printf(" En Passant is possible\n");
+  if (hasEnPassant == true) {
+    printf(" En Passant squares possible.\n");
+  }
   // Handle 50-move-rule tracking
   printf(" %s Half-Moves\n", whiteFiftyMoveTracker);
   printf(" %s Full-Moves\n", blackFiftyMoveTracker);
