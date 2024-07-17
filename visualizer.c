@@ -1,16 +1,20 @@
 #include "visualizer.h"
+
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+int whitePieceCount = 0, blackPieceCount = 0;
+
+bool whiteToMove = false, whiteCanCastle = false, blackCanCastle = false,
+     hasEnPassant = false;
+
+char FENString[92], whiteFiftyMoveTracker[2], blackFiftyMoveTracker[2],
+    finishedBoard[100];
+
 int main(int argc, char *argv[]) {
-  int whitePieceCount = 0, blackPieceCount = 0;
-  bool whiteToMove = false, whiteCanCastle = false, blackCanCastle = false,
-       hasEnPassant = false;
-  char FENString[92], whiteFiftyMoveTracker[2], blackFiftyMoveTracker[2];
-  char finishedBoard[100];
 
   // Error-checking user input
   if (argc != 2) {
@@ -19,13 +23,15 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  // Copy user string into FENString
+  // Create FENString based off of user input
   strncpy(FENString, argv[1], 90);
 
   processBoardAppearance(FENString, finishedBoard);
+
   processGameState(FENString, &whitePieceCount, &blackPieceCount,
                    whiteFiftyMoveTracker, blackFiftyMoveTracker, &whiteToMove,
                    &whiteCanCastle, &blackCanCastle, &hasEnPassant);
+
   printGame(FENString, finishedBoard, whitePieceCount, blackPieceCount,
             whiteToMove, whiteCanCastle, blackCanCastle, whiteFiftyMoveTracker,
             blackFiftyMoveTracker, hasEnPassant);
@@ -34,10 +40,13 @@ int main(int argc, char *argv[]) {
 }
 
 void processBoardAppearance(char FENString[], char finishedBoard[]) {
+  // Create a duplicate of FENString, because strtok is scary and I'm scared of
+  // it
   int FENStringLen = strlen(FENString);
   char FENStringCopy[FENStringLen];
   strcpy(FENStringCopy, FENString);
 
+  // Create a readable, finishedBoard array based off of FENString
   int i = 0, j = 0;
   while (FENStringCopy[i] != '\0') {
     if (isdigit(FENStringCopy[i])) {
@@ -65,9 +74,8 @@ void processGameState(char FENString[], int *whitePieceCount,
                       bool *hasEnPassant) {
   // Check amount of black and white pieces
   for (size_t i = 0; i < strlen(FENString); i++) {
-    if (isspace(FENString[i])) {
+    if (isspace(FENString[i]))
       break;
-    }
     if (isupper(FENString[i]))
       (*whitePieceCount)++;
     if (isupper(FENString[i]) == false && isalpha(FENString[i])) {
@@ -76,18 +84,24 @@ void processGameState(char FENString[], int *whitePieceCount,
   }
 
   bool castlingAssigned = false, halfMoveAssigned = false;
+
+  // Create a duplicate of FENString because strtok is scary and I'm scared of
+  // it
   int FENStringLength = strlen(FENString);
   char FENStringCopy[FENStringLength];
+
   strcpy(FENStringCopy, FENString);
+
+  // Tokenize FENString and start at second token
   char *token = strtok(FENStringCopy, " ");
   token = strtok(NULL, " ");
+
   while (token != NULL) {
     // Determine who goes next
-    if (strcmp(token, "w") == 0) {
+    if (strcmp(token, "w") == 0)
       *whiteToMove = true;
-    } else if (strcmp(token, "b") == 0) {
+    else if (strcmp(token, "b") == 0)
       *whiteToMove = false;
-    }
 
     int tokenLength = strlen(token);
     // Determine castling rights
@@ -100,13 +114,12 @@ void processGameState(char FENString[], int *whitePieceCount,
     }
 
     // Determine if en passant square exists
-    if (strcmp(token, "-") && castlingAssigned == true) {
+    if (strcmp(token, "-") && castlingAssigned == true)
       *hasEnPassant = false;
-    } else if (!strcmp(token, "-") && castlingAssigned == true) {
+    else if (!strcmp(token, "-") && castlingAssigned == true)
       *hasEnPassant = true;
-    }
 
-    // Half Move Counter
+    // Half Move Counter and Full Move Counter
     if (isdigit(token[0]) && halfMoveAssigned == false) {
       strcat(whiteFiftyMoveTracker, token);
       halfMoveAssigned = true;
@@ -152,13 +165,12 @@ void printGame(char FENString[], char finishedBoard[], int whitePieceCount,
     printf(" White does not have castling rights.\n");
   if (blackCanCastle)
     printf(" Black has castling rights.\n");
-  else if (!blackCanCastle) {
+  else if (!blackCanCastle)
     printf(" Black does not have castling rights.\n");
-  }
 
-  if (hasEnPassant == true) {
+  if (hasEnPassant == true)
     printf(" En Passant squares possible.\n");
-  }
+
   // Handle 50-move-rule tracking
   printf(" %s Half-Moves\n", whiteFiftyMoveTracker);
   printf(" %s Full-Moves\n", blackFiftyMoveTracker);
